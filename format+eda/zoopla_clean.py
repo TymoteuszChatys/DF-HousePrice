@@ -49,9 +49,19 @@ def clean_address(zoopla_df):
     zoopla_clean['location'] = zoopla_clean['location'].str.replace('[^A-Za-z0-9]+','',regex=True)
     zoopla_clean['location'] = zoopla_clean['location'].str.replace('Greater','',regex=True)
     zoopla_clean['location'] = zoopla_clean['location'].apply(lambda x: x.lower())
-
+    zoopla_clean = zoopla_clean.drop(columns="address")
     counts = zoopla_clean['location'].value_counts()
 
     zoopla_clean = zoopla_clean[~zoopla_clean['location'].isin(counts[counts < 25].index)]
+
+
+    return zoopla_clean
+
+def remove_outliers(zoopla_df):
+    zoopla_clean = zoopla_df.copy()
+
+    zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['beds'] > 5].index)
+    zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['baths'] > 5].index)
+    zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['receptions'] > 5].index)
 
     return zoopla_clean
