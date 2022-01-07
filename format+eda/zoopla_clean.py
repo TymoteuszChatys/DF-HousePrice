@@ -28,7 +28,7 @@ def clean_price(zoopla_df):
     zoopla_clean['price'] = zoopla_clean['price'].str.replace(',','')
     #Drop the row if we can not convert to a numeric type. This normally means that the property is POA (Price on application)
     zoopla_clean['price'] = pd.to_numeric(zoopla_clean['price'], errors='coerce')
-    zoopla_clean.dropna()
+    zoopla_clean = zoopla_clean.dropna()
 
     return zoopla_clean
 
