@@ -50,9 +50,12 @@ def clean_address(zoopla_df):
     zoopla_clean['location'] = zoopla_clean['location'].str.replace('Greater','',regex=True)
     zoopla_clean['location'] = zoopla_clean['location'].apply(lambda x: x.lower())
     zoopla_clean = zoopla_clean.drop(columns="address")
-    counts = zoopla_clean['location'].value_counts()
+    
+    loc_counts = zoopla_clean['location'].value_counts()
+    pc_counts = zoopla_clean['post_code'].value_counts()
 
-    zoopla_clean = zoopla_clean[~zoopla_clean['location'].isin(counts[counts < 25].index)]
+    zoopla_clean = zoopla_clean[~zoopla_clean['location'].isin(loc_counts[loc_counts < 25].index)]
+    zoopla_clean = zoopla_clean[~zoopla_clean['post_code'].isin(pc_counts[pc_counts < 5].index)]
 
 
     return zoopla_clean
