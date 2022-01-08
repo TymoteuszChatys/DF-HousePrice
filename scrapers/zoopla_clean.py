@@ -72,3 +72,11 @@ def remove_outliers(zoopla_df):
     zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['receptions'] > 5].index)
 
     return zoopla_clean
+
+
+def drop_duplicates(zoopla_df):
+    zoopla_clean = zoopla_df.copy()
+
+    zoopla_clean.drop_duplicates(ignore_index=True)
+
+    return zoopla_clean
