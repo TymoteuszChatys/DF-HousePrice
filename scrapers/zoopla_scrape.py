@@ -2,6 +2,41 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+
+def get_post_code_data(df):
+    pc_list = df['post_code'].to_list()
+
+    unique_pcs = set()
+    for x in pc_list:
+        unique_pcs.add(x)
+
+    unique_pcs = list(unique_pcs)
+    print(f"{len(unique_pcs)} unique post codes")
+
+    average_prices = []
+
+    for post_code in unique_pcs:
+        avg_link = f"https://www.zoopla.co.uk/house-prices/browse/{post_code}/?q={post_code}&search_source=house-prices"
+        soup = BeautifulSoup(requests.get(avg_link).content, features="html.parser")
+
+        items = soup.find("span", {"class":"market-panel-stat-element-value js-market-stats-average-price"}).contents
+
+        average_prices.append(items[0])
+
+    average_list = pd.DataFrame(
+        {'post_code': unique_pcs,
+        'avg_sold_price_12months': average_prices,
+        })
+
+    #Clean the price column and change it to a numeric type
+    average_list['avg_sold_price_12months'] = average_list['avg_sold_price_12months'].str.replace('£','')
+    average_list['avg_sold_price_12months'] = average_list['avg_sold_price_12months'].str.replace(',','')
+    #Drop the row if we can not convert to a numeric type. This normally means that the property is POA (avg_sold_price_12months on application)
+    average_list['avg_sold_price_12months'] = pd.to_numeric(average_list['avg_sold_price_12months'], errors='coerce')
+
+    return average_list
+
+
 def get_house_data(url):
     df = pd.DataFrame()
     pages = 1

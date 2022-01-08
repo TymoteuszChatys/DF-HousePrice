@@ -63,6 +63,10 @@ def clean_address(zoopla_df):
 def remove_outliers(zoopla_df):
     zoopla_clean = zoopla_df.copy()
 
+    zoopla_clean['beds'] = pd.to_numeric(zoopla_clean['beds'], errors='coerce')
+    zoopla_clean['baths'] = pd.to_numeric(zoopla_clean['baths'], errors='coerce')
+    zoopla_clean['receptions'] = pd.to_numeric(zoopla_clean['receptions'], errors='coerce')
+
     zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['beds'] > 5].index)
     zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['baths'] > 5].index)
     zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['receptions'] > 5].index)
