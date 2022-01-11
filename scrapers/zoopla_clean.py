@@ -70,6 +70,7 @@ def remove_outliers(zoopla_df):
     zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['beds'] > 5].index)
     zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['baths'] > 5].index)
     zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['receptions'] > 5].index)
+    zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['price'] < 100000].index)
 
     return zoopla_clean
 
