@@ -16,6 +16,8 @@ def clean_type(zoopla_df):
     property_types_to_keep = ["flat","terraced","semi-detached","detached","end terrace"]
     zoopla_clean = zoopla_clean[zoopla_clean['title'].isin(property_types_to_keep)]
 
+    zoopla_clean['title'] = zoopla_clean['title'].str.replace('end terrace','terraced')
+
     #Change name of column
     zoopla_clean = zoopla_clean.rename({'title': 'type'}, axis='columns')
 
@@ -54,7 +56,7 @@ def clean_address(zoopla_df):
     loc_counts = zoopla_clean['location'].value_counts()
     pc_counts = zoopla_clean['post_code'].value_counts()
 
-    zoopla_clean = zoopla_clean[~zoopla_clean['location'].isin(loc_counts[loc_counts < 25].index)]
+    #zoopla_clean = zoopla_clean[~zoopla_clean['location'].isin(loc_counts[loc_counts < 25].index)]
     zoopla_clean = zoopla_clean[~zoopla_clean['post_code'].isin(pc_counts[pc_counts < 5].index)]
 
 
@@ -70,7 +72,7 @@ def remove_outliers(zoopla_df):
     zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['beds'] > 5].index)
     zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['baths'] > 5].index)
     zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['receptions'] > 5].index)
-    zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['price'] < 100000].index)
+    zoopla_clean = zoopla_clean.drop(zoopla_clean[zoopla_clean['price'] < 105000].index)
 
     return zoopla_clean
 

@@ -13,26 +13,67 @@ def get_post_code_data(df):
     unique_pcs = list(unique_pcs)
     print(f"{len(unique_pcs)} unique post codes")
 
+    codes = []
     average_prices = []
+    detached = []
+    semi_detached = []
+    terraced = []
+    flat = []
 
     for post_code in unique_pcs:
-        avg_link = f"https://www.zoopla.co.uk/house-prices/browse/{post_code}/?q={post_code}&search_source=house-prices"
-        soup = BeautifulSoup(requests.get(avg_link).content, features="html.parser")
+        try:
+            avg_link = f"https://www.zoopla.co.uk/house-prices/browse/{post_code}/?q={post_code}&search_source=house-prices"
+            soup = BeautifulSoup(requests.get(avg_link).content, features="html.parser")
 
-        items = soup.find("span", {"class":"market-panel-stat-element-value js-market-stats-average-price"}).contents
+            all = soup.find("span", {"class":"market-panel-stat-element-value js-market-stats-average-price"})["data-value-all"]
+            s = soup.find("span", {"class":"market-panel-stat-element-value js-market-stats-average-price"})["data-value-s"]
+            t = soup.find("span", {"class":"market-panel-stat-element-value js-market-stats-average-price"})["data-value-t"]
+            f = soup.find("span", {"class":"market-panel-stat-element-value js-market-stats-average-price"})["data-value-f"]
+            d = soup.find("span", {"class":"market-panel-stat-element-value js-market-stats-average-price"})["data-value-d"]
 
-        average_prices.append(items[0])
+            arrays = [all,s,t,f,d]
+
+            prices_array = []
+
+
+            for type in arrays:
+                bb = []
+                for s in type.split(','):
+                    try:
+                        number = int(s)
+                    except:
+                        number = 0
+                    bb.append(number)
+
+                #3m,6m,12m,5y,10y,20y  ---> 2 = last year
+                prices_array.append(bb[2])
+
+            #prices_array #all, semi, terraced, flat, detached
+            average_prices.append(prices_array[0])
+            detached.append(prices_array[4])
+            semi_detached.append(prices_array[1])
+            terraced.append(prices_array[2])
+            flat.append(prices_array[3])
+            codes.append(post_code)
+        except:
+            print(f"Error - {post_code}")
 
     average_list = pd.DataFrame(
-        {'post_code': unique_pcs,
+        {'post_code': codes,
         'avg_sold_price_12months': average_prices,
+        'detached_12months': detached,
+        'semi_detached_12months': semi_detached,
+        'terraced_12months': terraced,
+        'flat_12months': flat,
         })
 
-    #Clean the price column and change it to a numeric type
-    average_list['avg_sold_price_12months'] = average_list['avg_sold_price_12months'].str.replace('£','')
-    average_list['avg_sold_price_12months'] = average_list['avg_sold_price_12months'].str.replace(',','')
+
     #Drop the row if we can not convert to a numeric type. This normally means that the property is POA (avg_sold_price_12months on application)
-    average_list['avg_sold_price_12months'] = pd.to_numeric(average_list['avg_sold_price_12months'], errors='coerce')
+    #average_list['avg_sold_price_12months'] = pd.to_numeric(average_list['avg_sold_price_12months'], errors='coerce')
+    #average_list['detached_12months'] = pd.to_numeric(average_list['detached_12months'], errors='coerce')
+    #average_list['semi_detached_12months'] = pd.to_numeric(average_list['semi_detached_12months'], errors='coerce')
+    #average_list['terraced_12months'] = pd.to_numeric(average_list['terraced_12months'], errors='coerce')
+    #average_list['flat_12months'] = pd.to_numeric(average_list['flat_12months'], errors='coerce')
 
     return average_list
 
